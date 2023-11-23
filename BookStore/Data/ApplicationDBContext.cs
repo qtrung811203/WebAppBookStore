@@ -5,7 +5,7 @@ namespace BookStore.Data
 {
     public class ApplicationDBContext:DbContext
     {
-        DbSet<Category> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options):base(options)
         {
             
