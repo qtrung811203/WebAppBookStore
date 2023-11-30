@@ -3,6 +3,7 @@ using BookStore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231125082519_AddBooksToTable")]
+    partial class AddBooksToTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +24,7 @@ namespace BookStore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BookShop.Models.Book", b =>
+            modelBuilder.Entity("BookStore.Models.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -40,8 +43,8 @@ namespace BookStore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -49,56 +52,7 @@ namespace BookStore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Books");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Author = "Microsoft",
-                            CategoryId = 1,
-                            Description = "Hello",
-                            Price = 10.0,
-                            Title = "C# Programming"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Author = "BTEC",
-                            CategoryId = 2,
-                            Description = "Learning Harder",
-                            Price = 11.0,
-                            Title = "Advanced Programming"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Author = "Sun",
-                            CategoryId = 3,
-                            Description = "Basic language",
-                            Price = 15.0,
-                            Title = "Java Programming"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Author = "Greenwich",
-                            CategoryId = 1,
-                            Description = "Really not easy",
-                            Price = 20.0,
-                            Title = "Data Structures"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Author = "Microsoft",
-                            CategoryId = 2,
-                            Description = "Now",
-                            Price = 10.0,
-                            Title = "App Dev"
-                        });
                 });
 
             modelBuilder.Entity("BookStore.Models.Category", b =>
@@ -146,17 +100,6 @@ namespace BookStore.Migrations
                             DisplayOrder = 0,
                             Name = "Cute"
                         });
-                });
-
-            modelBuilder.Entity("BookShop.Models.Book", b =>
-                {
-                    b.HasOne("BookStore.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

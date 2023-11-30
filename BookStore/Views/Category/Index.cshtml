@@ -3,7 +3,16 @@
 *@
 @{
 }
-@model List<Category>
+<partial name="_Notification" />
+<div>
+    <div class="col-6">
+        <h2>List of Categories</h2>
+    </div>
+    <div class="col-6">
+        <a asp-controller="Category" asp-action="Create">Create new category</a>
+    </div>
+</div>
+
 <h1>Categories </h1>
 <div>
     <table class="table table-bordered">
@@ -21,6 +30,10 @@
                     <td>@category.Name</td>
                     <td>@category.Description</td>
                     <td>@category.DisplayOrder</td>
+                    <td>
+                        <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-primary">Edit</a>
+                        <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.CategoryId" class="btn btn-danger">Delete</a>
+                    </td>
                 </tr>
             }
         </tbody>
