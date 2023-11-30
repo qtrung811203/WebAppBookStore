@@ -1,19 +1,21 @@
 ﻿using BookStore.Models;
 using BookStore.Data;
 using Microsoft.AspNetCore.Mvc;
+using BookStore.Repository.IRepository;
+using BookStore.Repository;
 
 namespace BookShop.Controllers
 {
     public class BookController : Controller
     {
-        private readonly ApplicationDBContext _dbContext;
-        public BookController(ApplicationDBContext dBContext)
+        private readonly IUnitOfWork _unitOfWork;
+        public BookController(IUnitOfWork unitOfWork)
         {
-            _dbContext = dBContext;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            List<Book> books = _dbContext.Books.ToList();
+            List<Book> books = _unitOfWork.BookRepository.GetAll().ToList();
             return View(books);
         }
 		public IActionResult CreateUpdate(int? id)
@@ -26,7 +28,7 @@ namespace BookShop.Controllers
 			else
 			{
 				//Update
-				book = _dbContext.Books.Find(id);
+				book = _unitOfWork.BookRepository.Get(b => b.Id == id);
 				return View(book);
 			}
 
@@ -39,16 +41,16 @@ namespace BookShop.Controllers
 			{
 				if (book.Id == 0)
 				{
-                    _dbContext.Books.Add(book);
+                    _unitOfWork.BookRepository.Add(book);
                     TempData["success"] = "Book Created successfully";
                 }
-				else
+                else
 				{
-                    _dbContext.Books.Update(book);
+                    _unitOfWork.BookRepository.Update(book);
                     TempData["success"] = "Book Updated successfully";
                 }
 
-				_dbContext.SaveChanges();
+                _unitOfWork.Save();
 				return RedirectToAction("Index");
 			}
 			return View();
@@ -59,7 +61,7 @@ namespace BookShop.Controllers
             {
                 return NotFound();
             }
-            Book? book = _dbContext.Books.Find(id);
+            Book? book = _unitOfWork.BookRepository.Get(b => b.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -69,8 +71,8 @@ namespace BookShop.Controllers
         [HttpPost]
         public IActionResult Delete(Book book)
         {
-            _dbContext.Books.Remove(book);
-            _dbContext.SaveChanges();
+            _unitOfWork.BookRepository.Delete(book);
+            _unitOfWork.Save();
             TempData["success"] = "Book Deleted successfully";
             return RedirectToAction("Index");
         }

@@ -38,14 +38,14 @@ namespace BookStore.Repository
             return query.ToList();
         }
 
-        public void Save()
-        {
-            _dbContext.SaveChanges();
-        }
-
         public void Update(T entity)
         {
             _dbContext.Update(entity);
+        }
+
+        public void Save()
+        {
+            throw new NotImplementedException();
         }
     }
 }
