@@ -11,9 +11,11 @@ namespace BookShop.Controllers
     public class BookController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public BookController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public BookController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -46,12 +48,32 @@ namespace BookShop.Controllers
         }
 
         [HttpPost]
-		public IActionResult CreateUpdate(BookVM bookVM)
+		public IActionResult CreateUpdate(BookVM bookVM, IFormFile? file)
 		{
 
 			if (ModelState.IsValid)
 			{
-				if (bookVM.Book.Id == 0)
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string bookPath = Path.Combine(wwwRootPath, @"images\books");
+
+                    if (!String.IsNullOrEmpty(bookVM.Book.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, bookVM.Book.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+                    using (var fileStream = new FileStream(Path.Combine(bookPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    bookVM.Book.ImageUrl = @"\images\books\" + fileName;
+                }
+                if (bookVM.Book.Id == 0)
 				{
                     _unitOfWork.BookRepository.Add(bookVM.Book);
                     TempData["success"] = "Book Created successfully";
