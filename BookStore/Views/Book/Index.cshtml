@@ -28,7 +28,7 @@
 					<td>@Book.Description</td>
 					<td>@Book.Author</td>
 					<td>@Book.Price</td>
-					<td></td>
+					<td>@Book.Category.Name</td>
 					<td>
 						<a asp-controller="Book" asp-action="CreateUpdate" asp-route-id="@Book.Id" class="btn btn-primary">Edit</a>
 						<a asp-controller="Book" asp-action="Delete" asp-route-id="@Book.Id" class="btn btn-danger">Delete</a>

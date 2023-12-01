@@ -3,6 +3,8 @@ using BookStore.Data;
 using Microsoft.AspNetCore.Mvc;
 using BookStore.Repository.IRepository;
 using BookStore.Repository;
+using BookStore.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookShop.Controllers
 {
@@ -15,45 +17,67 @@ namespace BookShop.Controllers
         }
         public IActionResult Index()
         {
-            List<Book> books = _unitOfWork.BookRepository.GetAll().ToList();
+            List<Book> books = _unitOfWork.BookRepository.GetAll("Category").ToList();
             return View(books);
         }
-		public IActionResult CreateUpdate(int? id)
-		{
-			Book book = new Book();
-			if (id == null||id==0) {
+        public IActionResult CreateUpdate(int? id)
+        {
+            BookVM bookVM = new BookVM()
+            {
+                Categories = _unitOfWork.CategoryRepository.GetAll().Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.CategoryId.ToString(),
+                }),
+                Book = new Book()
+            };
+            if (id == null || id == 0)
+            {
                 //Create
-                return View(book);
+                return View(bookVM);
             }
-			else
-			{
-				//Update
-				book = _unitOfWork.BookRepository.Get(b => b.Id == id);
-				return View(book);
-			}
+            else
+            {
+                //Update
+                bookVM.Book = _unitOfWork.BookRepository.Get(b => b.Id == id);
+                return View(bookVM);
+            }
 
-		}
-		[HttpPost]
-		public IActionResult CreateUpdate(Book book)
+        }
+
+        [HttpPost]
+		public IActionResult CreateUpdate(BookVM bookVM)
 		{
 
 			if (ModelState.IsValid)
 			{
-				if (book.Id == 0)
+				if (bookVM.Book.Id == 0)
 				{
-                    _unitOfWork.BookRepository.Add(book);
+                    _unitOfWork.BookRepository.Add(bookVM.Book);
                     TempData["success"] = "Book Created successfully";
                 }
                 else
 				{
-                    _unitOfWork.BookRepository.Update(book);
+                    _unitOfWork.BookRepository.Update(bookVM.Book);
                     TempData["success"] = "Book Updated successfully";
                 }
 
                 _unitOfWork.Save();
 				return RedirectToAction("Index");
 			}
-			return View();
+            else
+            {
+                BookVM bookVMNew = new BookVM()
+                {
+                    Categories = _unitOfWork.CategoryRepository.GetAll().Select(c => new SelectListItem
+                    {
+                        Text = c.Name,
+                        Value = c.CategoryId.ToString(),
+                    }),
+                    Book = new Book()
+                };
+                return View(bookVMNew);
+            }
 		}
         public IActionResult Delete(int? id)
         {

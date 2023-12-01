@@ -25,16 +25,24 @@ namespace BookStore.Repository
             DbSet.Remove(entity);
         }
 
-        public T Get(Expression<Func<T, bool>> filter)
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperty = null)
         {
             IQueryable<T> query = DbSet;
             query = query.Where(filter);
+            if (!String.IsNullOrEmpty(includeProperty))
+            {
+                query.Include(includeProperty).ToList();
+            }
             return query.FirstOrDefault();
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperty = null)
         {
             IQueryable<T> query = DbSet;
+            if (!String.IsNullOrEmpty(includeProperty))
+            {
+                query.Include(includeProperty).ToList();
+            }
             return query.ToList();
         }
 
@@ -44,6 +52,16 @@ namespace BookStore.Repository
         }
 
         public void Save()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<T> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public T Get(Expression<Func<T, bool>> filter)
         {
             throw new NotImplementedException();
         }
