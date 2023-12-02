@@ -6,8 +6,9 @@ using BookStore.Repository;
 using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace BookShop.Controllers
+namespace BookStore.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class BookController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -48,18 +49,18 @@ namespace BookShop.Controllers
         }
 
         [HttpPost]
-		public IActionResult CreateUpdate(BookVM bookVM, IFormFile? file)
-		{
+        public IActionResult CreateUpdate(BookVM bookVM, IFormFile? file)
+        {
 
-			if (ModelState.IsValid)
-			{
+            if (ModelState.IsValid)
+            {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
                 if (file != null)
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string bookPath = Path.Combine(wwwRootPath, @"images\books");
 
-                    if (!String.IsNullOrEmpty(bookVM.Book.ImageUrl))
+                    if (!string.IsNullOrEmpty(bookVM.Book.ImageUrl))
                     {
                         var oldImagePath = Path.Combine(wwwRootPath, bookVM.Book.ImageUrl.TrimStart('\\'));
                         if (System.IO.File.Exists(oldImagePath))
@@ -74,19 +75,19 @@ namespace BookShop.Controllers
                     bookVM.Book.ImageUrl = @"\images\books\" + fileName;
                 }
                 if (bookVM.Book.Id == 0)
-				{
+                {
                     _unitOfWork.BookRepository.Add(bookVM.Book);
                     TempData["success"] = "Book Created successfully";
                 }
                 else
-				{
+                {
                     _unitOfWork.BookRepository.Update(bookVM.Book);
                     TempData["success"] = "Book Updated successfully";
                 }
 
                 _unitOfWork.Save();
-				return RedirectToAction("Index");
-			}
+                return RedirectToAction("Index");
+            }
             else
             {
                 BookVM bookVMNew = new BookVM()
@@ -100,7 +101,7 @@ namespace BookShop.Controllers
                 };
                 return View(bookVMNew);
             }
-		}
+        }
         public IActionResult Delete(int? id)
         {
             if (id == null || id == 0)
